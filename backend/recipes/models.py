@@ -27,7 +27,7 @@ class Ingredient(models.Model):
         help_text='Введите название ингредиента'
     )
     measurement_unit = models.ForeignKey(
-        MeasurementUnit, 
+        MeasurementUnit,
         on_delete=models.PROTECT,
         verbose_name='Единица измерения'
     )
