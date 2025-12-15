@@ -166,6 +166,23 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             'id', 'ingredients', 'image', 'name', 
             'text', 'cooking_time'
         ]
+
+    def validate(self, data):
+        """
+        Проверка на уровне всего объекта.
+        Необходимо проверить наличие нужных полей в PATCH.
+        """
+        request = self.context.get('request')
+        
+        if request:
+            if request.method == 'PATCH':
+                for field in ['ingredients', 'name', 'text', 'cooking_time']:
+                    if field not in data:
+                        raise serializers.ValidationError({
+                            field: 'Это поле обязательно для создания рецепта'
+                        })
+        
+        return data
     
     def validate_ingredients(self, value):
         if not value:
