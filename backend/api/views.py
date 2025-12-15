@@ -1,4 +1,5 @@
 # api/views.py
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,9 +8,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from djoser import views as djoser_views
+from django.db.models import Sum, F
 
 from recipes.models import (
-    Recipe, Ingredient, Favorited, ShoppingCart
+    Recipe, Ingredient, Favorited, ShoppingCart, RecipeIngredient
 )
 from users.models import Follow
 from .serializers import (
@@ -116,7 +118,7 @@ class UserViewSet(djoser_views.UserViewSet):
             user=request.user
         ).values_list('following_id', flat=True)
         
-        users = User.objects.filter(id__in=following_ids)
+        users = User.objects.filter(id__in=following_ids).order_by('id')
         
         page = self.paginate_queryset(users)
         if page is not None:
@@ -203,7 +205,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve', 'get_link']:
             return [AllowAny()]  # Просмотр доступен всем
         
-        if self.action in ['create', 'favorite', 'shopping_cart']:
+        if self.action in ['create', 'favorite', 'download_shopping_cart']:
             return [IsAuthenticated()]  # Создание и добавление в избранное/корзину - авторизованным
         
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -321,78 +323,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False, 
         methods=['get'],
-        url_path='download_shopping_cart',
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
         """
         Скачивание списка покупок.
         """
-        from django.db.models import Sum, F
-        import io
-        from django.http import FileResponse
-        from reportlab.lib.pagesizes import A4
-        from reportlab.pdfgen import canvas
-        
         shopping_cart = ShoppingCart.objects.filter(user=request.user)
         recipes = [item.recipe for item in shopping_cart]
-        
+
         # Получаем ингредиенты из модели RecipeIngredient
-        from recipes.models import RecipeIngredient
         ingredients = RecipeIngredient.objects.filter(
             recipe__in=recipes
         ).values(
-            ingredient_name=F('ingredient__name'),
-            measurement_unit=F('ingredient__measurement_unit__title')
+            'ingredient__name',
+            'ingredient__measurement_unit__title'
         ).annotate(total_amount=Sum('amount'))
-        
-        accept_header = request.headers.get('Accept', '')
-        
-        if 'application/pdf' in accept_header:
-            # Генерация PDF
-            buffer = io.BytesIO()
-            p = canvas.Canvas(buffer, pagesize=A4)
-            p.drawString(100, 800, "Список покупок")
-            
-            y = 750
-            for item in ingredients:
-                text = (f"{item['ingredient_name']} - "
-                       f"{item['total_amount']} "
-                       f"{item['measurement_unit']}")
-                p.drawString(100, y, text)
-                y -= 20
-                
-                if y < 50:
-                    p.showPage()
-                    y = 750
-            
-            p.showPage()
-            p.save()
-            
-            buffer.seek(0)
-            return FileResponse(
-                buffer,
-                content_type='application/pdf',
-                as_attachment=True,
-                filename='shopping_list.pdf'
+
+        shopping_list = "Список покупок:\n\n"
+        for i, item in enumerate(ingredients):
+            shopping_list += (
+                f"{i + 1}) {item['ingredient__name']} — {item['total_amount']} {item['ingredient__measurement_unit__title']}\n"
             )
-        else:
-            # Генерация TXT
-            buffer = io.StringIO()
-            buffer.write("Список покупок:\n\n")
-            
-            for item in ingredients:
-                buffer.write(
-                    f"{item['ingredient_name']} - "
-                    f"{item['total_amount']} "
-                    f"{item['measurement_unit']}\n"
-                )
-            
-            buffer.seek(0)
-            response = FileResponse(
-                io.BytesIO(buffer.getvalue().encode('utf-8')),
-                content_type='text/plain',
-                as_attachment=True,
-                filename='shopping_list.txt'
-            )
-            return response
+
+        response = HttpResponse(
+            shopping_list,
+            content_type='text/plain; charset=utf-8'
+        )
+        response['Content-Disposition'] = 'attachment; filename=\"Список покупок.txt\"'
+        return response
