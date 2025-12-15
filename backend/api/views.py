@@ -237,8 +237,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Получение короткой ссылки на рецепт.
         """
         recipe = get_object_or_404(Recipe, pk=pk)
-        short_link = f"https://foodgram.example.org/s/{recipe.id}"
-        serializer = RecipeGetShortLinkSerializer({'short_link': short_link})
+        recipe = self.get_object()
+        serializer = RecipeGetShortLinkSerializer(
+            recipe,
+            context={'request': request}
+        )
         return Response(serializer.data)
     
     @action(

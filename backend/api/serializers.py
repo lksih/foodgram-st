@@ -310,7 +310,17 @@ class SetPasswordSerializer(serializers.Serializer):
 
 
 class RecipeGetShortLinkSerializer(serializers.Serializer):
-    short_link = serializers.URLField()
-    
     class Meta:
-        fields = ['short_link']
+        model = Recipe
+        fields = []
+    
+    def to_representation(self, instance):
+        """
+        Генерирует короткую ссылку прямо здесь.
+        """
+        request = self.context.get('request')
+        base_url = request.build_absolute_uri('/') if request else 'https://foodgram.example.org/'
+        
+        return {
+            'short-link': f"{base_url}s/{instance.id}"
+        }
