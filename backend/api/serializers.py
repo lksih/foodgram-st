@@ -1,5 +1,4 @@
 import base64
-import uuid
 
 from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
@@ -17,10 +16,9 @@ class Base64ImageField(serializers.ImageField):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
-            data = ContentFile(
-                base64.b64decode(imgstr),
-                name=f'{uuid.uuid4()}.{ext}'
-            )
+
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
         return super().to_internal_value(data)
 
 
@@ -31,7 +29,7 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    measurement_unit = MeasurementUnitSerializer(read_only=True)
+    measurement_unit = serializers.StringRelatedField()
     
     class Meta:
         model = Ingredient
@@ -206,6 +204,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
+        validated_data.pop('author', None)
         recipe = Recipe.objects.create(
             author=self.context['request'].user,
             **validated_data

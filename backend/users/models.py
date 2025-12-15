@@ -13,7 +13,7 @@ class AvataredUser(AbstractUser):
     last_name = models.CharField('last name', max_length=150)
     avatar = models.ImageField(
         'Аватар',
-        upload_to='avatars/',
+        upload_to='media/avatars/',
         blank=True,
         null=True
     )
