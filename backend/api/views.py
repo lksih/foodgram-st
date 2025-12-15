@@ -21,6 +21,7 @@ from .serializers import (
 )
 from .filters import RecipeFilter, IngredientFilter
 from .permissions import AuthorOrReadOnlyPermission
+from .pagination import PageLimitPagination
 
 User = get_user_model()
 
@@ -33,6 +34,7 @@ class UserViewSet(djoser_views.UserViewSet):
     serializer_class = UserSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'pk'
+    pagination_class = PageLimitPagination
 
     def get_permissions(self):
         """
@@ -180,7 +182,7 @@ class UserViewSet(djoser_views.UserViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
+    queryset = Ingredient.objects.all().order_by('id')
     serializer_class = IngredientSerializer
     pagination_class = None
     filterset_class = IngredientFilter
@@ -190,8 +192,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().order_by('id')
     filterset_class = RecipeFilter
+    pagination_class = PageLimitPagination
     
     def get_permissions(self):
         """
