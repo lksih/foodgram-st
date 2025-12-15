@@ -339,7 +339,7 @@ class RecipeGetShortLinkSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         """
-        Генерирует короткую ссылку прямо здесь.
+        Генерирует короткую ссылку.
         """
         request = self.context.get('request')
         if request:

@@ -1,4 +1,3 @@
-# api/views.py
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -40,9 +39,6 @@ class UserViewSet(djoser_views.UserViewSet):
     pagination_class = PageLimitPagination
 
     def get_permissions(self):
-        """
-        Определяем permissions для разных действий.
-        """
         # Для регистрации (create) и просмотра списка/детализации - доступ всем
         if self.action in ['create', 'list', 'retrieve']:
             return [AllowAny()]
@@ -93,7 +89,6 @@ class UserViewSet(djoser_views.UserViewSet):
     def avatar(self, request):
         """
         Добавление или удаление аватара текущего пользователя.
-        Один action обрабатывает PUT и DELETE методы.
         """
         if request.method == 'PUT':
             serializer = SetAvatarSerializer(
@@ -171,7 +166,6 @@ class UserViewSet(djoser_views.UserViewSet):
     def subscribe(self, request, pk=None):
         """
         Подписка или отписка от пользователя.
-        Один action обрабатывает POST и DELETE методы.
         """
         following = get_object_or_404(User, id=pk)
 
@@ -229,9 +223,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = PageLimitPagination
 
     def get_permissions(self):
-        """
-        Определяем permissions для разных действий с рецептами.
-        """
         if self.action in ['list', 'retrieve', 'get_link']:
             # Просмотр доступен всем
             return [AllowAny()]
@@ -241,7 +232,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
 
         if self.action in ['update', 'partial_update', 'destroy']:
-            # Обновление и удаление - авторизованным
+            # Обновление и удаление - авторам
             return [AuthorOrReadOnlyPermission()]
 
         return [IsAuthenticatedOrReadOnly()]
@@ -262,7 +253,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         """
         Добавление или удаление рецепта из избранного.
-        Один action обрабатывает POST и DELETE методы.
         """
         recipe = get_object_or_404(Recipe, pk=pk)
 
@@ -305,7 +295,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         """
         Добавление или удаление рецепта из списка покупок.
-        Один action обрабатывает POST и DELETE методы.
         """
         recipe = get_object_or_404(Recipe, pk=pk)
 
