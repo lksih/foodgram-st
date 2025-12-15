@@ -6,9 +6,6 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.views import APIView
-
-# Импортируем стандартные вью Djoser
 from djoser import views as djoser_views
 
 from recipes.models import (
@@ -23,6 +20,7 @@ from .serializers import (
     RecipeGetShortLinkSerializer, UserSerializer
 )
 from .filters import RecipeFilter
+from .permissions import AuthorOrReadOnlyPermission
 
 User = get_user_model()
 
@@ -133,7 +131,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]  # Создание и добавление в избранное/корзину - авторизованным
         
         if self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthenticated()]  # Обновление и удаление - авторизованным
+            return [AuthorOrReadOnlyPermission()]  # Обновление и удаление - авторизованным
         
         return [IsAuthenticatedOrReadOnly()]
     
