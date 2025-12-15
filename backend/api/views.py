@@ -49,6 +49,33 @@ class UserViewSet(djoser_views.UserViewSet):
         # Для обновления, удаления и всех остальных действий - только аутентифицированным
         return [IsAuthenticated()]
     
+    # Отключаем методы
+    def disabled_djoser_method_response(self):
+        return Response(
+            {"detail": "Djoser method not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
+    @action(["post"], detail=False)
+    def reset_password(self, request, *args, **kwargs):
+        return self.disabled_djoser_method_response()
+    
+    @action(["post"], detail=False)
+    def reset_password_confirm(self, request, *args, **kwargs):
+        return self.disabled_djoser_method_response()
+    
+    @action(["post"], detail=False)
+    def set_username(self, request, *args, **kwargs):
+        return self.disabled_djoser_method_response()
+    
+    @action(["post"], detail=False)
+    def reset_username(self, request, *args, **kwargs):
+        return self.disabled_djoser_method_response()
+    
+    @action(["post"], detail=False)
+    def reset_username_confirm(self, request, *args, **kwargs):
+        return self.disabled_djoser_method_response()
+    
     @action(detail=False, methods=['get'])
     def me(self, request):
         """
