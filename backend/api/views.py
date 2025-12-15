@@ -29,8 +29,10 @@ class UserViewSet(djoser_views.UserViewSet):
     """
     Переопределенный UserViewSet от Djoser.
     """
-    
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
+    lookup_field = 'id'
+    lookup_url_kwarg = 'pk'
 
     def get_permissions(self):
         """
@@ -40,11 +42,7 @@ class UserViewSet(djoser_views.UserViewSet):
         if self.action in ['create', 'list', 'retrieve']:
             return [AllowAny()]
         
-        # Для обновления и удаления - только аутентифицированным
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthenticated()]
-        
-        # Для всех остальных действий (me, avatar, set_password) - тоже аутентифицированным
+        # Для обновления, удаления и всех остальных действий - только аутентифицированным
         return [IsAuthenticated()]
     
     @action(detail=False, methods=['get'])
@@ -56,7 +54,7 @@ class UserViewSet(djoser_views.UserViewSet):
         return Response(serializer.data)
     
     @action(
-        detail=False, 
+        detail=False,
         methods=['put', 'delete'],
         url_path='me/avatar'
     )
@@ -88,9 +86,8 @@ class UserViewSet(djoser_views.UserViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(
-        detail=False, 
+        detail=False,
         methods=['post'],
-        url_path='set_password'
     )
     def set_password(self, request):
         """
@@ -104,6 +101,82 @@ class UserViewSet(djoser_views.UserViewSet):
         request.user.set_password(serializer.validated_data['new_password'])
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(
+        detail=False,
+        methods=['get']
+    )
+    def subscriptions(self, request):
+        """
+        Получение списка подписок текущего пользователя.
+        """
+        following_ids = Follow.objects.filter(
+            user=request.user
+        ).values_list('following_id', flat=True)
+        
+        users = User.objects.filter(id__in=following_ids)
+        
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = UserWithRecipesSerializer(
+                page, 
+                many=True, 
+                context={'request': request}
+            )
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = UserWithRecipesSerializer(
+            users, 
+            many=True, 
+            context={'request': request}
+        )
+        return Response(serializer.data)
+    
+    @action(
+        detail=True,
+        methods=['post', 'delete']
+    )
+    def subscribe(self, request, pk=None):
+        """
+        Подписка или отписка от пользователя.
+        Один action обрабатывает POST и DELETE методы.
+        """
+        following = get_object_or_404(User, id=pk)
+        
+        if request.method == 'POST':
+            if request.user == following:
+                return Response(
+                    {'error': 'Нельзя подписаться на себя'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if Follow.objects.filter(user=request.user, following=following).exists():
+                return Response(
+                    {'error': 'Вы уже подписаны на этого пользователя'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            Follow.objects.create(user=request.user, following=following)
+            serializer = UserWithRecipesSerializer(
+                following, 
+                context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        elif request.method == 'DELETE':
+            follow = Follow.objects.filter(
+                user=request.user, 
+                following=following
+            ).first()
+            
+            if not follow:
+                return Response(
+                    {'error': 'Вы не подписаны на этого пользователя'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            follow.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -320,106 +393,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 filename='shopping_list.txt'
             )
             return response
-
-
-class FollowViewSet(viewsets.ViewSet):
-    """
-    ViewSet для работы с подписками.
-    """
-    
-    def get_permissions(self):
-        return [IsAuthenticated()]
-    
-    def list(self, request):
-        """
-        Получение списка подписок текущего пользователя.
-        """
-        following_ids = Follow.objects.filter(
-            user=request.user
-        ).values_list('following_id', flat=True)
-        
-        users = User.objects.filter(id__in=following_ids)
-        
-        page = self.paginate_queryset(users)
-        if page is not None:
-            serializer = UserWithRecipesSerializer(
-                page, 
-                many=True, 
-                context={'request': request}
-            )
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = UserWithRecipesSerializer(
-            users, 
-            many=True, 
-            context={'request': request}
-        )
-        return Response(serializer.data)
-    
-    @action(
-        detail=False,
-        methods=['post', 'delete'],
-        url_path='(?P<pk>\d+)/subscribe'
-    )
-    def subscribe(self, request, pk=None):
-        """
-        Подписка или отписка от пользователя.
-        Один action обрабатывает POST и DELETE методы.
-        """
-        following = get_object_or_404(User, id=pk)
-        
-        if request.method == 'POST':
-            if request.user == following:
-                return Response(
-                    {'error': 'Нельзя подписаться на себя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            if Follow.objects.filter(user=request.user, following=following).exists():
-                return Response(
-                    {'error': 'Вы уже подписаны на этого пользователя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            Follow.objects.create(user=request.user, following=following)
-            serializer = UserWithRecipesSerializer(
-                following, 
-                context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        elif request.method == 'DELETE':
-            follow = Follow.objects.filter(
-                user=request.user, 
-                following=following
-            ).first()
-            
-            if not follow:
-                return Response(
-                    {'error': 'Вы не подписаны на этого пользователя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            follow.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    @property
-    def paginator(self):
-        if not hasattr(self, '_paginator'):
-            from rest_framework.pagination import PageNumberPagination
-            self._paginator = PageNumberPagination()
-            self._paginator.page_size = 6
-        return self._paginator
-    
-    def paginate_queryset(self, queryset):
-        if self.paginator is None:
-            return None
-        return self.paginator.paginate_queryset(
-            queryset, 
-            self.request, 
-            view=self
-        )
-    
-    def get_paginated_response(self, data):
-        assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
