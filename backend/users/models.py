@@ -7,10 +7,10 @@ class AvataredUser(AbstractUser):
         unique=True,
         blank=False,
         null=False,
-        verbose_name='Email'
+        verbose_name='Электронная почта'
     )
-    first_name = models.CharField('first name', max_length=150)
-    last_name = models.CharField('last name', max_length=150)
+    first_name = models.CharField('Имя', max_length=150)
+    last_name = models.CharField('Фамилия', max_length=150)
     avatar = models.ImageField(
         'Аватар',
         upload_to='media/avatars/',
@@ -31,9 +31,9 @@ class AvataredUser(AbstractUser):
 
 class Follow(models.Model):
     user = models.ForeignKey(
-        AvataredUser, on_delete=models.CASCADE, related_name='follows')
+        AvataredUser, on_delete=models.CASCADE, related_name='follows', verbose_name='Пользователь')
     following = models.ForeignKey(
-        AvataredUser, on_delete=models.CASCADE, related_name='followers')
+        AvataredUser, on_delete=models.CASCADE, related_name='followers', verbose_name='На кого подписан')
 
     class Meta:
         verbose_name = 'Подписка'
