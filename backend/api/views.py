@@ -19,7 +19,7 @@ from .serializers import (
     SetAvatarResponseSerializer, SetPasswordSerializer,
     RecipeGetShortLinkSerializer, UserSerializer
 )
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .permissions import AuthorOrReadOnlyPermission
 
 User = get_user_model()
@@ -183,6 +183,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filterset_class = IngredientFilter
     
     def get_permissions(self):
         return [AllowAny()]  # Доступ всем
@@ -190,7 +191,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
     
     def get_permissions(self):
