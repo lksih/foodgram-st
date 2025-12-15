@@ -2,13 +2,12 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from djoser import views as djoser_views
-from django.db.models import Sum, F
+from django.db.models import Sum
 
 from recipes.models import (
     Recipe, Ingredient, Favorited, ShoppingCart, RecipeIngredient
@@ -17,9 +16,9 @@ from users.models import Follow
 from .serializers import (
     RecipeListSerializer, RecipeCreateUpdateSerializer,
     IngredientSerializer, RecipeMinifiedSerializer,
-    UserWithRecipesSerializer, SetAvatarSerializer,
+    AvataredUserWithRecipesSerializer, SetAvatarSerializer,
     SetAvatarResponseSerializer, SetPasswordSerializer,
-    RecipeGetShortLinkSerializer, UserSerializer
+    RecipeGetShortLinkSerializer, AvataredUserSerializer
 )
 from .filters import RecipeFilter, IngredientFilter
 from .permissions import AuthorOrReadOnlyPermission
@@ -33,7 +32,7 @@ class UserViewSet(djoser_views.UserViewSet):
     Переопределенный UserViewSet от Djoser.
     """
     queryset = User.objects.all().order_by('id')
-    serializer_class = UserSerializer
+    serializer_class = AvataredUserSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'pk'
     pagination_class = PageLimitPagination
@@ -149,14 +148,14 @@ class UserViewSet(djoser_views.UserViewSet):
         
         page = self.paginate_queryset(users)
         if page is not None:
-            serializer = UserWithRecipesSerializer(
+            serializer = AvataredUserWithRecipesSerializer(
                 page, 
                 many=True, 
                 context={'request': request}
             )
             return self.get_paginated_response(serializer.data)
         
-        serializer = UserWithRecipesSerializer(
+        serializer = AvataredUserWithRecipesSerializer(
             users, 
             many=True, 
             context={'request': request}
@@ -188,7 +187,7 @@ class UserViewSet(djoser_views.UserViewSet):
                 )
             
             Follow.objects.create(user=request.user, following=following)
-            serializer = UserWithRecipesSerializer(
+            serializer = AvataredUserWithRecipesSerializer(
                 following, 
                 context={'request': request}
             )

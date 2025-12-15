@@ -3,8 +3,8 @@ import base64
 from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
-from djoser.serializers import UserSerializer as BaseUserSerializer
+from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserSerializer
 from recipes.models import Recipe, Ingredient, Favorited, ShoppingCart, MeasurementUnit, RecipeIngredient
 from users.models import Follow
 
@@ -64,7 +64,7 @@ class RecipeMinifiedSerializer(serializers.ModelSerializer):
         return None
 
 
-class UserSerializer(BaseUserSerializer):
+class AvataredUserSerializer(UserSerializer):
     """
     Сериализатор пользователя на основе Djoser.
     Добавляем поля is_subscribed и avatar.
@@ -72,7 +72,7 @@ class UserSerializer(BaseUserSerializer):
     is_subscribed = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
     
-    class Meta(BaseUserSerializer.Meta):
+    class Meta(UserSerializer.Meta):
         model = User
         fields = [
             'email', 'id', 'username', 'first_name', 
@@ -95,8 +95,8 @@ class UserSerializer(BaseUserSerializer):
         return None
 
 
-class CustomUserCreateSerializer(BaseUserCreateSerializer):
-    class Meta(BaseUserCreateSerializer.Meta):
+class AvataredUserCreateSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
         model = User
         fields = [
             'email', 'id', 'username', 'first_name', 
@@ -104,14 +104,8 @@ class CustomUserCreateSerializer(BaseUserCreateSerializer):
         ]
 
 
-class CustomUserResponseOnCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email', 'id', 'username', 'first_name', 'last_name']
-
-
 class RecipeListSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = AvataredUserSerializer(read_only=True)
     ingredients = IngredientInRecipeSerializer(
         source='recipe_ingredients', 
         many=True,
@@ -265,12 +259,12 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ).data
 
 
-class UserWithRecipesSerializer(UserSerializer):
+class AvataredUserWithRecipesSerializer(AvataredUserSerializer):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['recipes', 'recipes_count']
+    class Meta(AvataredUserSerializer.Meta):
+        fields = AvataredUserSerializer.Meta.fields + ['recipes', 'recipes_count']
     
     def get_recipes(self, obj):
         request = self.context.get('request')
