@@ -218,7 +218,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all().order_by('id')
+    queryset = Recipe.objects.all().order_by('-created_at')
     filterset_class = RecipeFilter
     pagination_class = PageLimitPagination
 

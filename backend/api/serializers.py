@@ -208,11 +208,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     f"Ингредиент с id {ingredient_id} не существует"
                 )
 
-            if amount < 1:
-                raise serializers.ValidationError(
-                    "Количество должно быть не менее 1"
-                )
-
             if ingredient_id in ingredient_ids:
                 raise serializers.ValidationError(
                     "Ингредиенты не должны повторяться"
