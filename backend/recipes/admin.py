@@ -36,7 +36,8 @@ class RecipeAdmin(admin.ModelAdmin):
     """Админка для модели рецептов."""
 
     list_display = ("name", "author", "favorites_count")
-    search_fields = ("name", "author__username", "author__email")
+    search_fields = ("name", "author__username", "author__first_name",
+                     "author__last_name", "author__email")
     list_filter = ("author",)
     inlines = (RecipeIngredientInline,)
     readonly_fields = ("favorites_count",)
