@@ -1,0 +1,101 @@
+[
+    {
+        "model": "recipes.recipe",
+        "pk": 18,
+        "fields": {
+            "author": 3,
+            "name": "Первый рецепт",
+            "image": "media/recipes/temp.jpeg",
+            "text": "Зачем нам есть капусту, когда есть картошка?",
+            "cooking_time": 20,
+            "created_at": "2025-12-16T15:58:37.676Z"
+        }
+    },
+    {
+        "model": "recipes.recipe",
+        "pk": 19,
+        "fields": {
+            "author": 3,
+            "name": "Пицца 4 хлеба",
+            "image": "media/recipes/temp_7qnilQt.jpeg",
+            "text": "Пицца 4 хлеба от нейросети",
+            "cooking_time": 120,
+            "created_at": "2025-12-16T16:04:36.857Z"
+        }
+    },
+    {
+        "model": "recipes.recipe",
+        "pk": 20,
+        "fields": {
+            "author": 1,
+            "name": "Бутерброд",
+            "image": "media/recipes/temp_OqGLUjE.jpeg",
+            "text": "Ничего лишнего",
+            "cooking_time": 1,
+            "created_at": "2025-12-16T16:09:52.671Z"
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 27,
+        "fields": {
+            "recipe": 18,
+            "ingredient": 2742,
+            "amount": 5
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 28,
+        "fields": {
+            "recipe": 19,
+            "ingredient": 4174,
+            "amount": 100
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 29,
+        "fields": {
+            "recipe": 19,
+            "ingredient": 4178,
+            "amount": 100
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 30,
+        "fields": {
+            "recipe": 19,
+            "ingredient": 4175,
+            "amount": 100
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 31,
+        "fields": {
+            "recipe": 19,
+            "ingredient": 4184,
+            "amount": 100
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 32,
+        "fields": {
+            "recipe": 20,
+            "ingredient": 4176,
+            "amount": 100
+        }
+    },
+    {
+        "model": "recipes.recipeingredient",
+        "pk": 33,
+        "fields": {
+            "recipe": 20,
+            "ingredient": 3935,
+            "amount": 30
+        }
+    }
+]

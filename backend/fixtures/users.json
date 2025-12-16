@@ -3,8 +3,8 @@
         "model": "users.avatareduser",
         "pk": 1,
         "fields": {
-            "password": "pbkdf2_sha256$260000$cky4q85ambBuKP48hezUSI$trsOYRJ/RnElVeM13WYGPmWFaPg+V/sOUIoibu7C19g=",
-            "last_login": "2025-12-16T12:05:46.425Z",
+            "password": "pbkdf2_sha256$260000$uOBk6lHs2bThilcOBgvxQb$MHyDBJ2yN4wuW9fnScyfFrY4iUf5v0FTQDAi30q27GQ=",
+            "last_login": "2025-12-16T16:05:52.109Z",
             "is_superuser": true,
             "username": "aboba",
             "is_staff": true,
@@ -22,7 +22,7 @@
         "model": "users.avatareduser",
         "pk": 2,
         "fields": {
-            "password": "pbkdf2_sha256$260000$Xxkafydwq7XiFccOOIKoVw$9V8vbh41dGGNV4KEsC8rPN8UsFp78oq8gMloggXb+Ak=",
+            "password": "pbkdf2_sha256$260000$NWfyR2eRJN8RhTTwxmcDId$VQU8lURuBpw3I2z3e4OMYozwiQfMUy//xf2xq1XQ3do=",
             "last_login": "2025-12-16T12:11:56.021Z",
             "is_superuser": false,
             "username": "Пользователь",
@@ -41,8 +41,8 @@
         "model": "users.avatareduser",
         "pk": 3,
         "fields": {
-            "password": "pbkdf2_sha256$260000$OzUQju2TEmxOdBaNEo9zM5$MsvhVdiF8/Eg5NV2B1cpzFMJdzrVVX358oHl3aAJsIM=",
-            "last_login": null,
+            "password": "pbkdf2_sha256$260000$4ZXAkdVFsKOyvBJFKI9m5F$NCilwD1FHVHiC+vlvxcalvkkpV5SCxaSgt1SuQJaR14=",
+            "last_login": "2025-12-16T15:56:24.917Z",
             "is_superuser": false,
             "username": "simpleuser2",
             "is_staff": false,
@@ -60,7 +60,7 @@
         "model": "users.avatareduser",
         "pk": 4,
         "fields": {
-            "password": "pbkdf2_sha256$260000$35AYsrt6JbsXs2jHB9EAYb$ObbSN/2sK3fQTydgthUPmDUT6wrpwMh1V5H57kBE/OU=",
+            "password": "pbkdf2_sha256$260000$k8z2ds03no5Dt3997RjQ7a$q0OMY/4dt1ZmqyUvVV3JbYd/3AXXqh0SfbnHwD9rQJU=",
             "last_login": null,
             "is_superuser": true,
             "username": "aboba2",
