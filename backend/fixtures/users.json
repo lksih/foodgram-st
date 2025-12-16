@@ -1,0 +1,78 @@
+[
+    {
+        "model": "users.avatareduser",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$cky4q85ambBuKP48hezUSI$trsOYRJ/RnElVeM13WYGPmWFaPg+V/sOUIoibu7C19g=",
+            "last_login": "2025-12-16T12:05:46.425Z",
+            "is_superuser": true,
+            "username": "aboba",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2025-12-16T12:05:30.581Z",
+            "email": "aboba@mail.ru",
+            "first_name": "aboba",
+            "last_name": "aboba",
+            "avatar": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.avatareduser",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$Xxkafydwq7XiFccOOIKoVw$9V8vbh41dGGNV4KEsC8rPN8UsFp78oq8gMloggXb+Ak=",
+            "last_login": "2025-12-16T12:11:56.021Z",
+            "is_superuser": false,
+            "username": "Пользователь",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-12-16T12:11:48.237Z",
+            "email": "simpleuser@mail.ru",
+            "first_name": "simpleuser",
+            "last_name": "Обычный",
+            "avatar": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.avatareduser",
+        "pk": 3,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$OzUQju2TEmxOdBaNEo9zM5$MsvhVdiF8/Eg5NV2B1cpzFMJdzrVVX358oHl3aAJsIM=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "simpleuser2",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-12-16T12:16:53.967Z",
+            "email": "simpleuser2@mail.ru",
+            "first_name": "Ещё",
+            "last_name": "Пользователь",
+            "avatar": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.avatareduser",
+        "pk": 4,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$35AYsrt6JbsXs2jHB9EAYb$ObbSN/2sK3fQTydgthUPmDUT6wrpwMh1V5H57kBE/OU=",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "aboba2",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2025-12-16T13:25:40.312Z",
+            "email": "aboba2@mail.ru",
+            "first_name": "Второй",
+            "last_name": "Админ",
+            "avatar": "",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]
