@@ -7,7 +7,7 @@ from rest_framework.permissions import (
     IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 )
 from rest_framework.response import Response
-from djoser import views as djoser_views
+from djoser.views import UserViewSet
 from django.db.models import Sum
 
 from recipes.models import (
@@ -28,7 +28,7 @@ from .pagination import PageLimitPagination
 User = get_user_model()
 
 
-class UserViewSet(djoser_views.UserViewSet):
+class AvataredUserViewSet(UserViewSet):
     """
     Переопределенный UserViewSet от Djoser.
     """

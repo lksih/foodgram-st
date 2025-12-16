@@ -3,11 +3,11 @@ from rest_framework.routers import DefaultRouter
 from djoser.views import TokenCreateView, TokenDestroyView
 
 from .views import (
-    UserViewSet, RecipeViewSet, IngredientViewSet
+    AvataredUserViewSet, RecipeViewSet, IngredientViewSet
 )
 
 router = DefaultRouter()
-router.register('users', UserViewSet, basename='user')
+router.register('users', AvataredUserViewSet, basename='user')
 router.register('recipes', RecipeViewSet, basename='recipe')
 router.register('ingredients', IngredientViewSet, basename='ingredient')
 
