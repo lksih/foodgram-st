@@ -1,0 +1,86 @@
+[
+  {
+    "model": "recipes.measurementunit",
+    "pk": 1,
+    "fields": {
+      "title": "г"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 2,
+    "fields": {
+      "title": "мл"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 3,
+    "fields": {
+      "title": "шт."
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 4,
+    "fields": {
+      "title": "ч. л."
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 5,
+    "fields": {
+      "title": "ст. л."
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 6,
+    "fields": {
+      "title": "капля"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 7,
+    "fields": {
+      "title": "банка"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 8,
+    "fields": {
+      "title": "кусок"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 9,
+    "fields": {
+      "title": "стакан"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 10,
+    "fields": {
+      "title": "щепотка"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 11,
+    "fields": {
+      "title": "горсть"
+    }
+  },
+  {
+    "model": "recipes.measurementunit",
+    "pk": 12,
+    "fields": {
+      "title": "веточка"
+    }
+  }
+]
