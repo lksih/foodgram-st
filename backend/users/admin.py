@@ -30,6 +30,24 @@ class AvataredUserAdmin(UserAdmin):
         ("Даты активности", {"fields": ("last_login", "date_joined")}),
     )
 
+    add_fieldsets = (
+        (None, {"fields": ("username", "password1", "password2")}),
+        ("Информация",
+         {"fields": ("first_name", "last_name", "email", "avatar")}),
+        (
+            "Разрешения",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+    )
+
 
 class FollowAdmin(admin.ModelAdmin):
     """Админка для модели подписок."""
