@@ -11,6 +11,12 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   frontend:
     container_name: foodgram-front
     build: ../frontend
@@ -24,7 +30,8 @@ services:
       - media:/app/media/
     env_file: .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   nginx:
     container_name: foodgram-proxy
     image: nginx:1.25.4-alpine
