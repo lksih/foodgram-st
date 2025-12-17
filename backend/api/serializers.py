@@ -6,9 +6,12 @@ from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer
 from recipes.models import (
-    Recipe, Ingredient, Favorited,
-    ShoppingCart, MeasurementUnit, RecipeIngredient
+    Recipe, Ingredient,
+    MeasurementUnit, RecipeIngredient
 )
+
+MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
 
 User = get_user_model()
 
@@ -45,7 +48,10 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
         source='ingredient.measurement_unit.title',
         read_only=True
     )
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(
+        min_value=MIN_AMOUNT,
+        max_value=MAX_AMOUNT
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -146,9 +152,24 @@ class RecipeListSerializer(serializers.ModelSerializer):
         return None
 
 
+class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient',
+        queryset=Ingredient.objects.all()
+    )
+    amount = serializers.IntegerField(
+        min_value=MIN_AMOUNT,
+        max_value=MAX_AMOUNT
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ['id', 'amount']
+
+
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
-    ingredients = serializers.ListField(
-        child=serializers.DictField(),
+    ingredients = IngredientInRecipeCreateSerializer(
+        many=True,
         write_only=True
     )
     image = Base64ImageField()
@@ -183,29 +204,35 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 "Добавьте хотя бы один ингредиент"
             )
 
-        ingredient_ids = []
+        ingredients = set()
         for ingredient_data in value:
-            ingredient_id = ingredient_data.get('id')
+            ingredient = ingredient_data.get('ingredient')
             amount = ingredient_data.get('amount')
 
-            if not ingredient_id or not amount:
+            if not ingredient or not amount:
                 raise serializers.ValidationError(
                     "Каждый ингредиент должен содержать id и amount"
                 )
 
-            if not Ingredient.objects.filter(id=ingredient_id).exists():
-                raise serializers.ValidationError(
-                    f"Ингредиент с id {ingredient_id} не существует"
-                )
-
-            if ingredient_id in ingredient_ids:
+            if ingredient in ingredients:
                 raise serializers.ValidationError(
                     "Ингредиенты не должны повторяться"
                 )
 
-            ingredient_ids.append(ingredient_id)
+            ingredients.add(ingredient)
 
         return value
+
+    def parse_and_create_ingredients(self, recipe, ingredients_data):
+        recipe_ingredients = []
+        for ingredient_data in ingredients_data:
+            recipe_ingredients.append(RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=ingredient_data['ingredient'].id,
+                amount=ingredient_data['amount']
+            ))
+
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
@@ -215,15 +242,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
-        recipe_ingredients = []
-        for ingredient_data in ingredients_data:
-            recipe_ingredients.append(RecipeIngredient(
-                recipe=recipe,
-                ingredient_id=ingredient_data['id'],
-                amount=ingredient_data['amount']
-            ))
+        self.parse_and_create_ingredients(recipe, ingredients_data)
 
-        RecipeIngredient.objects.bulk_create(recipe_ingredients)
         return recipe
 
     def update(self, instance, validated_data):
@@ -233,16 +253,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        if ingredients_data is not None:
-            RecipeIngredient.objects.filter(recipe=instance).delete()
-            recipe_ingredients = []
-            for ingredient_data in ingredients_data:
-                recipe_ingredients.append(RecipeIngredient(
-                    recipe=instance,
-                    ingredient_id=ingredient_data['id'],
-                    amount=ingredient_data['amount']
-                ))
-            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        RecipeIngredient.objects.filter(recipe=instance).delete()
+        self.parse_and_create_ingredients(instance, ingredients_data)
 
         return instance
 
