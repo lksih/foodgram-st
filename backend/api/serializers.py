@@ -5,17 +5,12 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer
+from django.conf import settings
 
-from backend.foodgram_st_backend.settings import BASE_URL_FALLBACK
 from recipes.models import (
     Recipe, Ingredient,
     MeasurementUnit, RecipeIngredient
 )
-
-MIN_AMOUNT = 1
-MAX_AMOUNT = 32000
-MIN_COOKING_TIME = 1
-MAX_COOKING_TIME = 32000
 
 User = get_user_model()
 
@@ -53,8 +48,8 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
         read_only=True
     )
     amount = serializers.IntegerField(
-        min_value=MIN_AMOUNT,
-        max_value=MAX_AMOUNT
+        min_value=settings.MIN_AMOUNT,
+        max_value=settings.MAX_AMOUNT
     )
 
     class Meta:
@@ -162,8 +157,8 @@ class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all()
     )
     amount = serializers.IntegerField(
-        min_value=MIN_AMOUNT,
-        max_value=MAX_AMOUNT
+        min_value=settings.MIN_AMOUNT,
+        max_value=settings.MAX_AMOUNT
     )
 
     class Meta:
@@ -178,8 +173,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     )
     image = Base64ImageField()
     cooking_time = serializers.IntegerField(
-        min_value=MIN_COOKING_TIME,
-        max_value=MAX_COOKING_TIME
+        min_value=settings.MIN_COOKING_TIME,
+        max_value=settings.MAX_COOKING_TIME
     )
 
     class Meta:
@@ -344,7 +339,7 @@ class RecipeGetShortLinkSerializer(serializers.Serializer):
         if request:
             base_url = request.build_absolute_uri('/')
         else:
-            base_url = BASE_URL_FALLBACK
+            base_url = settings.BASE_URL_FALLBACK
 
         return {
             'short-link': f'{base_url}s/{instance.id}'
