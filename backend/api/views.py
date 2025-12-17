@@ -137,10 +137,10 @@ class AvataredUserViewSet(UserViewSet):
         """
         Получение списка подписок текущего пользователя.
         """
-        following_ids = Follow.objects.filter(
-            user=request.user
-        ).values_list('following_id', flat=True)
-
+        following_ids = request.user.follows.values_list(
+            'following_id',
+            flat=True
+        )
         users = User.objects.filter(id__in=following_ids).order_by('id')
 
         page = self.paginate_queryset(users)
@@ -176,9 +176,7 @@ class AvataredUserViewSet(UserViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            if Follow.objects.filter(
-                user=request.user, following=following
-            ).exists():
+            if request.user.follows.filter(following=following).exists():
                 return Response(
                     {'error': 'Вы уже подписаны на этого пользователя'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -192,10 +190,7 @@ class AvataredUserViewSet(UserViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         elif request.method == 'DELETE':
-            follow = Follow.objects.filter(
-                user=request.user,
-                following=following
-            ).first()
+            follow = request.user.follows.filter(following=following).first()
 
             if not follow:
                 return Response(
@@ -257,9 +252,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
 
         if request.method == 'POST':
-            if Favorited.objects.filter(
-                user=request.user, recipe=recipe
-            ).exists():
+            if request.user.favorites.filter(recipe=recipe).exists():
                 return Response(
                     {'error': 'Рецепт уже в избранном'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -273,10 +266,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         elif request.method == 'DELETE':
-            favorite = Favorited.objects.filter(
-                user=request.user,
-                recipe=recipe
-            ).first()
+            favorite = request.user.favorites.filter(recipe=recipe).first()
 
             if not favorite:
                 return Response(
@@ -299,9 +289,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
 
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(
-                user=request.user, recipe=recipe
-            ).exists():
+            if request.user.shopping_cart.filter(recipe=recipe).exists():
                 return Response(
                     {'error': 'Рецепт уже в списке покупок'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -315,8 +303,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         elif request.method == 'DELETE':
-            shopping_cart = ShoppingCart.objects.filter(
-                user=request.user,
+            shopping_cart = request.user.shopping_cart.filter(
                 recipe=recipe
             ).first()
 
@@ -355,7 +342,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         Скачивание списка покупок.
         """
-        shopping_cart = ShoppingCart.objects.filter(user=request.user)
+        shopping_cart = request.user.shopping_cart.all()
         recipes = [item.recipe for item in shopping_cart]
 
         # Получаем ингредиенты из модели RecipeIngredient
