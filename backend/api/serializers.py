@@ -208,7 +208,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, value):
         if not value:
             raise serializers.ValidationError(
-                "Добавьте хотя бы один ингредиент"
+                'Добавьте хотя бы один ингредиент'
             )
 
         ingredients = set()
@@ -217,7 +217,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
             if ingredient in ingredients:
                 raise serializers.ValidationError(
-                    "Ингредиенты не должны повторяться"
+                    'Ингредиенты не должны повторяться'
                 )
 
             ingredients.add(ingredient)
@@ -326,7 +326,7 @@ class SetPasswordSerializer(serializers.Serializer):
     def validate_current_password(self, value):
         user = self.context['request'].user
         if not user.check_password(value):
-            raise serializers.ValidationError("Неверный текущий пароль")
+            raise serializers.ValidationError('Неверный текущий пароль')
         return value
 
 
@@ -346,5 +346,5 @@ class RecipeGetShortLinkSerializer(serializers.Serializer):
             base_url = 'https://foodgram.example.org/'
 
         return {
-            'short-link': f"{base_url}s/{instance.id}"
+            'short-link': f'{base_url}s/{instance.id}'
         }

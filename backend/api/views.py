@@ -49,27 +49,27 @@ class AvataredUserViewSet(UserViewSet):
     # Отключаем методы
     def disabled_djoser_method_response(self):
         return Response(
-            {"detail": "Djoser method not allowed."},
+            {'detail': 'Djoser method not allowed.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
-    @action(["post"], detail=False)
+    @action(['post'], detail=False)
     def reset_password(self, request, *args, **kwargs):
         return self.disabled_djoser_method_response()
 
-    @action(["post"], detail=False)
+    @action(['post'], detail=False)
     def reset_password_confirm(self, request, *args, **kwargs):
         return self.disabled_djoser_method_response()
 
-    @action(["post"], detail=False)
+    @action(['post'], detail=False)
     def set_username(self, request, *args, **kwargs):
         return self.disabled_djoser_method_response()
 
-    @action(["post"], detail=False)
+    @action(['post'], detail=False)
     def reset_username(self, request, *args, **kwargs):
         return self.disabled_djoser_method_response()
 
-    @action(["post"], detail=False)
+    @action(['post'], detail=False)
     def reset_username_confirm(self, request, *args, **kwargs):
         return self.disabled_djoser_method_response()
 
@@ -353,12 +353,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__measurement_unit__title'
         ).annotate(total_amount=Sum('amount'))
 
-        shopping_list = "Список покупок:\n\n"
+        shopping_list = 'Список покупок:\n\n'
         for i, item in enumerate(ingredients):
+            name = item['ingredient__name']
+            amount = item['total_amount']
+            measurement_unit = item['ingredient__measurement_unit__title']
+
             shopping_list += (
-                f"{i + 1}) {item['ingredient__name']} — "
-                f"{item['total_amount']} "
-                f"{item['ingredient__measurement_unit__title']}\n"
+                f'{i + 1}) {name} — '
+                f'{amount} '
+                f'{measurement_unit}\n'
             )
 
         response = HttpResponse(
