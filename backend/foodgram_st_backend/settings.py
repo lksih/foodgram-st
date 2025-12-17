@@ -28,6 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = (os.getenv('ALLOWED_HOSTS', '')).split(',')
 
+BASE_URL_FALLBACK = 'https://foodgram.example.org/'
 
 # Application definition
 

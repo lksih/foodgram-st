@@ -6,6 +6,7 @@ from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer
 
+from backend.foodgram_st_backend.settings import BASE_URL_FALLBACK
 from recipes.models import (
     Recipe, Ingredient,
     MeasurementUnit, RecipeIngredient
@@ -343,7 +344,7 @@ class RecipeGetShortLinkSerializer(serializers.Serializer):
         if request:
             base_url = request.build_absolute_uri('/')
         else:
-            base_url = 'https://foodgram.example.org/'
+            base_url = BASE_URL_FALLBACK
 
         return {
             'short-link': f'{base_url}s/{instance.id}'
