@@ -12,6 +12,8 @@ from recipes.models import (
 
 MIN_AMOUNT = 1
 MAX_AMOUNT = 32000
+MIN_COOKING_TIME = 1
+MAX_COOKING_TIME = 32000
 
 User = get_user_model()
 
@@ -173,6 +175,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         write_only=True
     )
     image = Base64ImageField()
+    cooking_time = serializers.IntegerField(
+        min_value=MIN_COOKING_TIME,
+        max_value=MAX_COOKING_TIME
+    )
 
     class Meta:
         model = Recipe
@@ -207,12 +213,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ingredients = set()
         for ingredient_data in value:
             ingredient = ingredient_data.get('ingredient')
-            amount = ingredient_data.get('amount')
-
-            if not ingredient or not amount:
-                raise serializers.ValidationError(
-                    "Каждый ингредиент должен содержать id и amount"
-                )
 
             if ingredient in ingredients:
                 raise serializers.ValidationError(
@@ -253,7 +253,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        RecipeIngredient.objects.filter(recipe=instance).delete()
+        instance.recipe_ingredients.all().delete()
         self.parse_and_create_ingredients(instance, ingredients_data)
 
         return instance
