@@ -1,6 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
+MIN_COOKING_TIME = 1
+MAX_COOKING_TIME = 32000
 
 User = get_user_model()
 
@@ -13,6 +18,7 @@ class MeasurementUnit(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Единица измерения'
         verbose_name_plural = 'Единицы измерения'
 
@@ -33,6 +39,7 @@ class Ingredient(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
@@ -53,9 +60,12 @@ class Recipe(models.Model):
         upload_to='media/recipes/'
     )
     text = models.TextField('Описание')
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления (минуты)',
-        validators=[MinValueValidator(1)]
+        validators=[
+            MinValueValidator(MIN_COOKING_TIME),
+            MaxValueValidator(MAX_COOKING_TIME)
+        ]
     )
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -66,6 +76,7 @@ class Recipe(models.Model):
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -86,12 +97,16 @@ class RecipeIngredient(models.Model):
         related_name='recipe_ingredients',
         verbose_name='Ингредиент'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Количество',
-        validators=[MinValueValidator(1)]
+        validators=[
+            MinValueValidator(MIN_COOKING_TIME),
+            MaxValueValidator(MAX_COOKING_TIME)
+        ]
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Ингредиенты рецепта'
         verbose_name_plural = 'Ингредиенты рецептов'
 
@@ -114,6 +129,7 @@ class Favorited(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
 
@@ -136,6 +152,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
 
