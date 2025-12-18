@@ -351,7 +351,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit__title'
-        ).annotate(total_amount=Sum('amount'))
+        ).annotate(
+            total_amount=Sum('amount')
+        ).order_by(
+            'ingredient__name'
+        )
 
         shopping_list = 'Список покупок:\n\n'
         for i, item in enumerate(ingredients):
